@@ -1,0 +1,65 @@
+#!amber
+# Copyright 2020 The Amber Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# VkPhysicalDeviceSubgroupProperties can be requested as part of the query VkPhysicalDeviceProperties2
+INSTANCE_EXTENSION VK_KHR_get_physical_device_properties2
+DEVICE_EXTENSION VK_KHR_shader_float16_int8
+DEVICE_EXTENSION VK_KHR_storage_buffer_storage_class
+DEVICE_EXTENSION VK_KHR_8bit_storage
+DEVICE_EXTENSION VK_KHR_shader_subgroup_extended_types
+DEVICE_FEATURE Float16Int8Features.shaderInt8
+DEVICE_FEATURE Storage8BitFeatures.uniformAndStorageBuffer8BitAccess
+DEVICE_FEATURE Storage8BitFeatures.storagePushConstant8
+DEVICE_FEATURE SubgroupSupportedOperations.basic
+DEVICE_FEATURE SubgroupSupportedOperations.vote
+DEVICE_FEATURE SubgroupSupportedOperations.arithmetic
+DEVICE_FEATURE SubgroupSupportedOperations.ballot
+DEVICE_FEATURE SubgroupSupportedOperations.shuffle
+DEVICE_FEATURE SubgroupSupportedOperations.shuffleRelative
+DEVICE_FEATURE SubgroupSupportedOperations.clustered
+DEVICE_FEATURE SubgroupSupportedOperations.quad
+
+SHADER compute comp_shader GLSL
+#version 460
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_arithmetic: require
+
+layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
+
+
+layout(set = 0, binding = 0) buffer BlockA {
+   uint data[];
+} ssbo_fake_volatile;
+
+
+void main() {
+  uint temp_val = gl_GlobalInvocationID.x;
+  ssbo_fake_volatile.data[gl_GlobalInvocationID.x] =  subgroupAdd(temp_val) ;
+}
+END
+
+BUFFER buf_fake_volatile DATA_TYPE uint32 SIZE 1048576 FILL 0
+
+PIPELINE compute pipeline
+  ATTACH comp_shader
+  BIND BUFFER buf_fake_volatile AS storage DESCRIPTOR_SET 0 BINDING 0
+END
+
+
+REPEAT 33
+RUN TIMED_EXECUTION pipeline 1 1 1
+END
+
+# EXPECT buf_fake_volatile IDX 0 EQ  12
