@@ -171,7 +171,7 @@ cd /data/local/tmp
 ./amber_ndk -d <shader-test-files>
 ```
 
-#### ChromeOS plain executable (not officially supported)
+### ChromeOS plain executable (not officially supported)
 
 It is possible to obtain produce a cross compiled amber binary for ChromeOS.
 Start with the standard amber checkout
