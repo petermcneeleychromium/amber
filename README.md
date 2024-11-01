@@ -171,6 +171,60 @@ cd /data/local/tmp
 ./amber_ndk -d <shader-test-files>
 ```
 
+#### ChromeOS plain executable (not officially supported)
+
+It is possible to obtain produce a cross compiled amber binary for ChromeOS.
+
+```
+git clone https://github.com/google/amber.git
+cd amber
+./tools/git-sync-deps
+
+./tools/update_build_version.py . samples/ third_party/
+./tools/update_vk_wrappers.py . .
+
+mkdir -p out/Debug
+cd out/Debug
+
+```
+Then add the cmake cross compiling variable to the root amber CMakeLists.txt
+
+The example ChromeOS platform used here is trogdor.
+
+```
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
+
+set(CMAKE_SYSROOT "/usr/local/google/home/petermcneeley/chromium/src/build/cros_cache/chrome-sdk/symlinks/trogdor+16074.0.0-1064250+sysroot_chromeos-base_chromeos-chrome.tar.xz/")
+set(CMAKE_STAGING_PREFIX /home/devel/stage)
+
+set(tools "/usr/local/google/home/petermcneeley/chromium/src/build/cros_cache/chrome-sdk/symlinks/trogdor+16074.0.0-1064250+target_toolchain")
+set(CMAKE_C_COMPILER ${tools}/bin/aarch64-cros-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER ${tools}/bin/aarch64-cros-linux-gnu-g++)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+# To avoid having the host try to execute a cross compiled binary 'asm_offsets'
+set(USE_GAS OFF)
+
+```
+
+```
+cmake -GNinja ../..
+ninja amber
+# Copy over the amber binary to the DUT
+scp amber device:/root/amber
+
+```
+
+The resulting executable will be produced as
+`build/app/local/<abi>/amber_ndk`. This executable can be run via the adb shell
+on your device, e.g. under `/data/local/tmp` (`/sdcard` is generally not
+suitable because it is mounted with a non-executable flag). Also, vulkan layers
+may not be available to this executable as it is not an app, so make sure to use
+the `-d` flag to disable Vulkan layers:
+
 ### Optional components
 
 The components which build up Amber can be enabled or disabled as needed. Any
