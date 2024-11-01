@@ -232,9 +232,9 @@ With this line.
 	set_target_properties(${TARGET} PROPERTIES LINK_FLAGS -static-libstdc++)
 ```
 
+Finally we can build and deploy the amber binary.
+
 ```
-
-
 mkdir -p out/Debug
 cd out/Debug
 cmake -GNinja ../..  -DAMBER_USE_LOCAL_VULKAN=1  
