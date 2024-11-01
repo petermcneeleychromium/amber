@@ -242,7 +242,7 @@ ninja amber
 # Copy over the amber binary to the DUT (note the root disk partion has limited space)
 scp amber device:/root/amber
 # An example of how to copy over some amber scripts
-scp ../../tests/cases device:/root/
+scp ../../tests/cases/* device:/root/
 
 ```
 Now by ssh-ing into the DUT you can locally run any amber script. Also, vulkan layers
