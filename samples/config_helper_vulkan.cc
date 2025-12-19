@@ -915,7 +915,11 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
       supports_.spirv_1_4 = true;
     } else if (ext == VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) {
       supports_.shader_float_controls = true;
+    } else if (ext == VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME) {
+      printf(" TEST TEST TEST this is working \n");
+      supports_.vulkan_memory_model = true;
     }
+    
   }
 
   VkPhysicalDeviceFeatures required_vulkan_features =
@@ -932,6 +936,7 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     VkPhysicalDeviceFloat16Int8FeaturesKHR float16_int8_features = {};
     VkPhysicalDevice8BitStorageFeaturesKHR storage_8bit_features = {};
     VkPhysicalDevice16BitStorageFeaturesKHR storage_16bit_features = {};
+   VkPhysicalDeviceVulkanMemoryModelFeatures memory_model_structure_features{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR
         acceleration_structure_features = {};
     VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features =
@@ -960,6 +965,11 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES_KHR;
     variable_pointers_features.pNext = next_ptr;
     next_ptr = &variable_pointers_features;
+
+    memory_model_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
+    memory_model_structure_features.pNext = next_ptr;
+    next_ptr = &memory_model_structure_features;
+
 
     shader_subgroup_extended_types_features.sType =
         // NOLINTNEXTLINE(whitespace/line_length)
@@ -1046,6 +1056,7 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
 
       if ((feature == kVariablePointers &&
            variable_pointers_features.variablePointers == VK_FALSE) ||
+           (memory_model_structure_features.vulkanMemoryModel == VK_FALSE) ||
           (feature == kVariablePointersStorageBuffer &&
            variable_pointers_features.variablePointersStorageBuffer ==
                VK_FALSE) ||
@@ -1268,6 +1279,14 @@ amber::Result ConfigHelperVulkan::CreateDeviceWithFeatures2(
       } else if (feature == kVariablePointersStorageBuffer) {
         features_.variable_pointers.variablePointersStorageBuffer = VK_TRUE;
       }
+    } if (StartsWith(feature, "VulkanMemoryModelFeatures.")) {
+      init_feature(
+          supports_.vulkan_memory_model, features_.memory_model_structure,
+          VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR,
+          VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME);
+      features_.memory_model_structure.vulkanMemoryModel = VK_TRUE;
+      features_.memory_model_structure.vulkanMemoryModelDeviceScope = VK_TRUE;
+            printf( " ok this is now working? \n");
     } else if (StartsWith(feature, "Float16Int8Features.")) {
       init_feature(supports_.shader_float16_int8, features_.float16_int8,
                    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR,
