@@ -66,6 +66,9 @@ const char k16BitStorage_PushConstant[] =
 const char k16BitStorage_InputOutput[] =
     "Storage16BitFeatures.storageInputOutput16";
 
+const char kVulkanMemoryModel_vulkanMemoryModel[] = "VulkanMemoryModelFeatures.vulkanMemoryModel";
+const char kVulkanMemoryModel_vulkanMemoryModelDeviceScope[] = "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope";
+
 const char kSubgroupSizeControl[] = "SubgroupSizeControl.subgroupSizeControl";
 const char kComputeFullSubgroups[] = "SubgroupSizeControl.computeFullSubgroups";
 
@@ -887,25 +890,25 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     return amber::Result("Device does not support all required extensions");
   }
   for (const auto& ext : vk_.available_device_extensions) {
-    if (ext == "VK_KHR_shader_float16_int8") {
+    if (ext == VK_KHR_SHADER_FLOAT16_INT8_EXTENSION_NAME) {
       supports_.shader_float16_int8 = true;
-    } else if (ext == "VK_KHR_8bit_storage") {
+    } else if (ext == VK_KHR_8BIT_STORAGE_EXTENSION_NAME) {
       supports_.shader_8bit_storage = true;
-    } else if (ext == "VK_KHR_16bit_storage") {
+    } else if (ext == VK_KHR_16BIT_STORAGE_EXTENSION_NAME) {
       supports_.shader_16bit_storage = true;
-    } else if (ext == "VK_EXT_subgroup_size_control") {
+    } else if (ext == VK_EXT_SUBGROUP_SIZE_CONTROL_EXTENSION_NAME) {
       supports_.subgroup_size_control = true;
-    } else if (ext == "VK_EXT_depth_clamp_zero_one") {
+    } else if (ext == VK_EXT_DEPTH_CLAMP_ZERO_ONE_EXTENSION_NAME) {
       supports_.depth_clamp_zero_one = true;
-    } else if (ext == "VK_KHR_shader_subgroup_extended_types") {
+    } else if (ext == VK_KHR_SHADER_SUBGROUP_EXTENDED_TYPES_EXTENSION_NAME) {
       supports_.shader_subgroup_extended_types = true;
-    } else if (ext == "VK_KHR_variable_pointers") {
+    } else if (ext == VK_KHR_VARIABLE_POINTERS_EXTENSION_NAME) {
       supports_.variable_pointers = true;
-    } else if (ext == "VK_KHR_acceleration_structure") {
+    } else if (ext == VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) {
       supports_.acceleration_structure = true;
-    } else if (ext == "VK_KHR_buffer_device_address") {
+    } else if (ext == VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) {
       supports_.buffer_device_address = true;
-    } else if (ext == "VK_KHR_ray_tracing_pipeline") {
+    } else if (ext == VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) {
       supports_.ray_tracing_pipeline = true;
     } else if (ext == VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) {
       supports_.descriptor_indexing = true;
@@ -916,7 +919,6 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     } else if (ext == VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME) {
       supports_.shader_float_controls = true;
     } else if (ext == VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME) {
-      printf(" TEST TEST TEST this is working \n");
       supports_.vulkan_memory_model = true;
     }
     
@@ -936,7 +938,7 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     VkPhysicalDeviceFloat16Int8FeaturesKHR float16_int8_features = {};
     VkPhysicalDevice8BitStorageFeaturesKHR storage_8bit_features = {};
     VkPhysicalDevice16BitStorageFeaturesKHR storage_16bit_features = {};
-   VkPhysicalDeviceVulkanMemoryModelFeatures memory_model_structure_features{};
+    VkPhysicalDeviceVulkanMemoryModelFeatures memory_model_structure_features{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR
         acceleration_structure_features = {};
     VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features =
@@ -966,10 +968,10 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     variable_pointers_features.pNext = next_ptr;
     next_ptr = &variable_pointers_features;
 
-    memory_model_structure_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
+    memory_model_structure_features.sType = 
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
     memory_model_structure_features.pNext = next_ptr;
     next_ptr = &memory_model_structure_features;
-
 
     shader_subgroup_extended_types_features.sType =
         // NOLINTNEXTLINE(whitespace/line_length)
@@ -1056,7 +1058,10 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
 
       if ((feature == kVariablePointers &&
            variable_pointers_features.variablePointers == VK_FALSE) ||
-           (memory_model_structure_features.vulkanMemoryModel == VK_FALSE) ||
+           (feature == kVulkanMemoryModel_vulkanMemoryModel &&
+            memory_model_structure_features.vulkanMemoryModel == VK_FALSE) ||
+           (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope &&
+            memory_model_structure_features.vulkanMemoryModelDeviceScope == VK_FALSE) ||
           (feature == kVariablePointersStorageBuffer &&
            variable_pointers_features.variablePointersStorageBuffer ==
                VK_FALSE) ||
@@ -1284,9 +1289,11 @@ amber::Result ConfigHelperVulkan::CreateDeviceWithFeatures2(
           supports_.vulkan_memory_model, features_.memory_model_structure,
           VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR,
           VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME);
-      features_.memory_model_structure.vulkanMemoryModel = VK_TRUE;
-      features_.memory_model_structure.vulkanMemoryModelDeviceScope = VK_TRUE;
-            printf( " ok this is now working? \n");
+      if (feature == kVulkanMemoryModel_vulkanMemoryModel) {
+        features_.memory_model_structure.vulkanMemoryModel = VK_TRUE;
+      } else if (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope) {
+        features_.memory_model_structure.vulkanMemoryModelDeviceScope = VK_TRUE;
+      }
     } else if (StartsWith(feature, "Float16Int8Features.")) {
       init_feature(supports_.shader_float16_int8, features_.float16_int8,
                    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT16_INT8_FEATURES_KHR,

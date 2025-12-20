@@ -106,7 +106,8 @@ bool Script::IsKnownFeature(const std::string& name) const {
          name == "VariablePointerFeatures.variablePointers" ||
          name == "VariablePointerFeatures.variablePointersStorageBuffer" ||
          name == "Float16Int8Features.shaderFloat16" ||
-         name == "VulkanMemoryModelFeatures.xxx" || 
+         name == "VulkanMemoryModelFeatures.vulkanMemoryModel" || 
+         name == "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope" || 
          name == "Float16Int8Features.shaderInt8" ||
          name == "Storage8BitFeatures.storageBuffer8BitAccess" ||
          name == "Storage8BitFeatures.uniformAndStorageBuffer8BitAccess" ||
