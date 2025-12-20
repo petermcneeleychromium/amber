@@ -66,8 +66,10 @@ const char k16BitStorage_PushConstant[] =
 const char k16BitStorage_InputOutput[] =
     "Storage16BitFeatures.storageInputOutput16";
 
-const char kVulkanMemoryModel_vulkanMemoryModel[] = "VulkanMemoryModelFeatures.vulkanMemoryModel";
-const char kVulkanMemoryModel_vulkanMemoryModelDeviceScope[] = "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope";
+const char kVulkanMemoryModel_vulkanMemoryModel[] =
+  "VulkanMemoryModelFeatures.vulkanMemoryModel";
+const char kVulkanMemoryModel_vulkanMemoryModelDeviceScope[] =
+  "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope";
 
 const char kSubgroupSizeControl[] = "SubgroupSizeControl.subgroupSizeControl";
 const char kComputeFullSubgroups[] = "SubgroupSizeControl.computeFullSubgroups";
@@ -921,7 +923,6 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     } else if (ext == VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME) {
       supports_.vulkan_memory_model = true;
     }
-    
   }
 
   VkPhysicalDeviceFeatures required_vulkan_features =
@@ -968,7 +969,7 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     variable_pointers_features.pNext = next_ptr;
     next_ptr = &variable_pointers_features;
 
-    memory_model_structure_features.sType = 
+    memory_model_structure_features.sType =
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
     memory_model_structure_features.pNext = next_ptr;
     next_ptr = &memory_model_structure_features;
@@ -1061,7 +1062,8 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
            (feature == kVulkanMemoryModel_vulkanMemoryModel &&
             memory_model_structure_features.vulkanMemoryModel == VK_FALSE) ||
            (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope &&
-            memory_model_structure_features.vulkanMemoryModelDeviceScope == VK_FALSE) ||
+            memory_model_structure_features.vulkanMemoryModelDeviceScope
+            == VK_FALSE) ||
           (feature == kVariablePointersStorageBuffer &&
            variable_pointers_features.variablePointersStorageBuffer ==
                VK_FALSE) ||
@@ -1284,7 +1286,7 @@ amber::Result ConfigHelperVulkan::CreateDeviceWithFeatures2(
       } else if (feature == kVariablePointersStorageBuffer) {
         features_.variable_pointers.variablePointersStorageBuffer = VK_TRUE;
       }
-    } if (StartsWith(feature, "VulkanMemoryModelFeatures.")) {
+    } else if (StartsWith(feature, "VulkanMemoryModelFeatures.")) {
       init_feature(
           supports_.vulkan_memory_model, features_.memory_model_structure,
           VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR,

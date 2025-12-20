@@ -62,7 +62,8 @@ DEVICE_FEATURE VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope)";
   EXPECT_EQ("SubgroupSizeControl.subgroupSizeControl", features[11]);
   EXPECT_EQ("SubgroupSizeControl.computeFullSubgroups", features[12]);
   EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModel", features[13]);
-  EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope", features[14]);
+  EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope",
+    features[14]);
 }
 
 TEST_F(AmberScriptParserTest, DeviceFeatureMissingFeature) {
