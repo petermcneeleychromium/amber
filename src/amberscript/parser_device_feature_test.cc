@@ -34,7 +34,9 @@ DEVICE_FEATURE Storage16BitFeatures.uniformAndStorageBuffer16BitAccess
 DEVICE_FEATURE Storage16BitFeatures.storagePushConstant16
 DEVICE_FEATURE Storage16BitFeatures.storageInputOutput16
 DEVICE_FEATURE SubgroupSizeControl.subgroupSizeControl
-DEVICE_FEATURE SubgroupSizeControl.computeFullSubgroups)";
+DEVICE_FEATURE SubgroupSizeControl.computeFullSubgroups
+DEVICE_FEATURE VulkanMemoryModelFeatures.vulkanMemoryModel
+DEVICE_FEATURE VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope)";
 
   Parser parser;
   Result r = parser.Parse(in);
@@ -42,7 +44,7 @@ DEVICE_FEATURE SubgroupSizeControl.computeFullSubgroups)";
 
   auto script = parser.GetScript();
   const auto& features = script->GetRequiredFeatures();
-  ASSERT_EQ(13U, features.size());
+  ASSERT_EQ(15U, features.size());
   EXPECT_EQ("vertexPipelineStoresAndAtomics", features[0]);
   EXPECT_EQ("VariablePointerFeatures.variablePointersStorageBuffer",
             features[1]);
@@ -59,6 +61,9 @@ DEVICE_FEATURE SubgroupSizeControl.computeFullSubgroups)";
   EXPECT_EQ("Storage16BitFeatures.storageInputOutput16", features[10]);
   EXPECT_EQ("SubgroupSizeControl.subgroupSizeControl", features[11]);
   EXPECT_EQ("SubgroupSizeControl.computeFullSubgroups", features[12]);
+  EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModel", features[13]);
+  EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope",
+    features[14]);
 }
 
 TEST_F(AmberScriptParserTest, DeviceFeatureMissingFeature) {
