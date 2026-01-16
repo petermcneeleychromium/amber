@@ -71,8 +71,9 @@ const char kVulkanMemoryModel_vulkanMemoryModel[] =
 const char kVulkanMemoryModel_vulkanMemoryModelDeviceScope[] =
   "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope";
 
-const char kZeroInitializeWorkgroupMemory_shaderZeroInitializeWorkgroupMemory[] =
-  "ZeroInitializeWorkgroupMemoryFeatures.shaderZeroInitializeWorkgroupMemory";
+const char kZeroInitializeWorkgroupMemory[] =
+  "ZeroInitializeWorkgroupMemoryFeatures."
+  "shaderZeroInitializeWorkgroupMemory";
 
 const char kSubgroupSizeControl[] = "SubgroupSizeControl.subgroupSizeControl";
 const char kComputeFullSubgroups[] = "SubgroupSizeControl.computeFullSubgroups";
@@ -982,7 +983,8 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     next_ptr = &memory_model_structure_features;
 
     zero_initialize_workgroup_memory_features.sType =
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
+    // NOLINTNEXTLINE(whitespace/line_length)
+      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
     zero_initialize_workgroup_memory_features.pNext = next_ptr;
     next_ptr = &zero_initialize_workgroup_memory_features;
 
@@ -1076,9 +1078,10 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
            (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope &&
             memory_model_structure_features.vulkanMemoryModelDeviceScope
             == VK_FALSE) ||
-           (feature == kZeroInitializeWorkgroupMemory_shaderZeroInitializeWorkgroupMemory &&
-            zero_initialize_workgroup_memory_features.shaderZeroInitializeWorkgroupMemory
-            == VK_FALSE) ||
+           (feature ==
+            kZeroInitializeWorkgroupMemory &&
+            zero_initialize_workgroup_memory_features
+                .shaderZeroInitializeWorkgroupMemory == VK_FALSE) ||
           (feature == kVariablePointersStorageBuffer &&
            variable_pointers_features.variablePointersStorageBuffer ==
                VK_FALSE) ||
@@ -1315,10 +1318,14 @@ amber::Result ConfigHelperVulkan::CreateDeviceWithFeatures2(
       init_feature(
           supports_.zero_initialize_workgroup_memory,
           features_.zero_initialize_workgroup_memory_features,
+          // NOLINTNEXTLINE(whitespace/line_length)
           VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR,
+          // NOLINTNEXTLINE(whitespace/line_length)
           VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME);
-      if (feature == kZeroInitializeWorkgroupMemory_shaderZeroInitializeWorkgroupMemory) {
-        features_.zero_initialize_workgroup_memory_features.shaderZeroInitializeWorkgroupMemory = VK_TRUE;
+      if (feature ==
+          kZeroInitializeWorkgroupMemory) {
+        features_.zero_initialize_workgroup_memory_features
+            .shaderZeroInitializeWorkgroupMemory = VK_TRUE;
       }
     } else if (StartsWith(feature, "Float16Int8Features.")) {
       init_feature(supports_.shader_float16_int8, features_.float16_int8,

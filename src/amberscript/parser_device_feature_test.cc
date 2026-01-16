@@ -65,7 +65,8 @@ DEVICE_FEATURE ZeroInitializeWorkgroupMemoryFeatures.shaderZeroInitializeWorkgro
   EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModel", features[13]);
   EXPECT_EQ("VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope",
     features[14]);
-  EXPECT_EQ("ZeroInitializeWorkgroupMemoryFeatures.shaderZeroInitializeWorkgroupMemory",
+  EXPECT_EQ("ZeroInitializeWorkgroupMemoryFeatures."
+            "shaderZeroInitializeWorkgroupMemory",
     features[15]);
 }
 
