@@ -71,6 +71,10 @@ const char kVulkanMemoryModel_vulkanMemoryModel[] =
 const char kVulkanMemoryModel_vulkanMemoryModelDeviceScope[] =
   "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope";
 
+const char kZeroInitializeWorkgroupMemory[] =
+  "ZeroInitializeWorkgroupMemoryFeatures."
+  "shaderZeroInitializeWorkgroupMemory";
+
 const char kSubgroupSizeControl[] = "SubgroupSizeControl.subgroupSizeControl";
 const char kComputeFullSubgroups[] = "SubgroupSizeControl.computeFullSubgroups";
 
@@ -922,6 +926,8 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
       supports_.shader_float_controls = true;
     } else if (ext == VK_KHR_VULKAN_MEMORY_MODEL_EXTENSION_NAME) {
       supports_.vulkan_memory_model = true;
+    } else if (ext == VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME) {
+      supports_.zero_initialize_workgroup_memory = true;
     }
   }
 
@@ -940,6 +946,8 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
     VkPhysicalDevice8BitStorageFeaturesKHR storage_8bit_features = {};
     VkPhysicalDevice16BitStorageFeaturesKHR storage_16bit_features = {};
     VkPhysicalDeviceVulkanMemoryModelFeatures memory_model_structure_features{};
+    VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR
+        zero_initialize_workgroup_memory_features{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR
         acceleration_structure_features = {};
     VkPhysicalDeviceBufferDeviceAddressFeatures buffer_device_address_features =
@@ -973,6 +981,12 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_MEMORY_MODEL_FEATURES_KHR;
     memory_model_structure_features.pNext = next_ptr;
     next_ptr = &memory_model_structure_features;
+
+    zero_initialize_workgroup_memory_features.sType =
+    // NOLINTNEXTLINE(whitespace/line_length)
+      VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR;
+    zero_initialize_workgroup_memory_features.pNext = next_ptr;
+    next_ptr = &zero_initialize_workgroup_memory_features;
 
     shader_subgroup_extended_types_features.sType =
         // NOLINTNEXTLINE(whitespace/line_length)
@@ -1064,6 +1078,10 @@ amber::Result ConfigHelperVulkan::CheckVulkanPhysicalDeviceRequirements(
            (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope &&
             memory_model_structure_features.vulkanMemoryModelDeviceScope
             == VK_FALSE) ||
+           (feature ==
+            kZeroInitializeWorkgroupMemory &&
+            zero_initialize_workgroup_memory_features
+                .shaderZeroInitializeWorkgroupMemory == VK_FALSE) ||
           (feature == kVariablePointersStorageBuffer &&
            variable_pointers_features.variablePointersStorageBuffer ==
                VK_FALSE) ||
@@ -1295,6 +1313,19 @@ amber::Result ConfigHelperVulkan::CreateDeviceWithFeatures2(
         features_.memory_model_structure.vulkanMemoryModel = VK_TRUE;
       } else if (feature == kVulkanMemoryModel_vulkanMemoryModelDeviceScope) {
         features_.memory_model_structure.vulkanMemoryModelDeviceScope = VK_TRUE;
+      }
+    } else if (StartsWith(feature, "ZeroInitializeWorkgroupMemoryFeatures.")) {
+      init_feature(
+          supports_.zero_initialize_workgroup_memory,
+          features_.zero_initialize_workgroup_memory_features,
+          // NOLINTNEXTLINE(whitespace/line_length)
+          VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ZERO_INITIALIZE_WORKGROUP_MEMORY_FEATURES_KHR,
+          // NOLINTNEXTLINE(whitespace/line_length)
+          VK_KHR_ZERO_INITIALIZE_WORKGROUP_MEMORY_EXTENSION_NAME);
+      if (feature ==
+          kZeroInitializeWorkgroupMemory) {
+        features_.zero_initialize_workgroup_memory_features
+            .shaderZeroInitializeWorkgroupMemory = VK_TRUE;
       }
     } else if (StartsWith(feature, "Float16Int8Features.")) {
       init_feature(supports_.shader_float16_int8, features_.float16_int8,

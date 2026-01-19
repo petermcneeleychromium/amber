@@ -108,6 +108,9 @@ bool Script::IsKnownFeature(const std::string& name) const {
          name == "Float16Int8Features.shaderFloat16" ||
          name == "VulkanMemoryModelFeatures.vulkanMemoryModel" ||
          name == "VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope" ||
+         name ==
+             "ZeroInitializeWorkgroupMemoryFeatures."
+             "shaderZeroInitializeWorkgroupMemory" ||
          name == "Float16Int8Features.shaderInt8" ||
          name == "Storage8BitFeatures.storageBuffer8BitAccess" ||
          name == "Storage8BitFeatures.uniformAndStorageBuffer8BitAccess" ||

@@ -131,6 +131,7 @@ class ConfigHelperVulkan : public ConfigHelperImpl {
     bool spirv_1_4 = false;
     bool shader_float_controls = false;
     bool vulkan_memory_model = false;
+    bool zero_initialize_workgroup_memory = false;
   } supports_;
 
   struct {
@@ -149,6 +150,8 @@ class ConfigHelperVulkan : public ConfigHelperImpl {
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR ray_tracing_pipeline{};
     VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing{};
     VkPhysicalDeviceVulkanMemoryModelFeatures memory_model_structure{};
+    VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR
+        zero_initialize_workgroup_memory_features{};
   } features_;
 };
 
