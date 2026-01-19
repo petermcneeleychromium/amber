@@ -25,7 +25,7 @@ DEVICE_FEATURE ZeroInitializeWorkgroupMemoryFeatures.shaderZeroInitializeWorkgro
 # the vulkan workgroup memory init extension. (Look for OpConstantNull) 
 # Code created from dawn end2end test ComputeSharedMemoryTests.complexZeroInit
 
-SHADER compute workgroup_shared_atomic SPIRV-ASM
+SHADER compute workgroup_shared_atomic SPIRV-ASM TARGET_ENV spv1.4
 ; SPIR-V
 ; Version: 1.4
 ; Generator: Google Tint Compiler; 1
@@ -81,7 +81,7 @@ BUFFER buf_uint2 DATA_TYPE uint32 SIZE 16 FILL 777
 
 PIPELINE compute pipeline
   ATTACH workgroup_shared_atomic
-  BIND BUFFER buf_uint AS uniform DESCRIPTOR_SET 0 BINDING 0
+  BIND BUFFER buf_uint AS storage DESCRIPTOR_SET 0 BINDING 0
   BIND BUFFER buf_uint2 AS storage DESCRIPTOR_SET 0 BINDING 1
 END
 
