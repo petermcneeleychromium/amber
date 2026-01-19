@@ -1,5 +1,5 @@
 #!amber
-# Copyright 2025 Google LLC
+# Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ DEVICE_FEATURE VulkanMemoryModelFeatures.vulkanMemoryModel
 DEVICE_FEATURE VulkanMemoryModelFeatures.vulkanMemoryModelDeviceScope
 DEVICE_FEATURE ZeroInitializeWorkgroupMemoryFeatures.shaderZeroInitializeWorkgroupMemory
 
-# Code from dawn end2end ComputeSharedMemoryTests.complexZeroInit
+# This test exercises the vulkan memory model extension and
+# the vulkan workgroup memory init extension. (Look for OpConstantNull) 
+# Code created from dawn end2end test ComputeSharedMemoryTests.complexZeroInit
 
 SHADER compute workgroup_shared_atomic SPIRV-ASM
 ; SPIR-V
